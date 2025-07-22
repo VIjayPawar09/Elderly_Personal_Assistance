@@ -1,4 +1,3 @@
-// components/RegisterModal.jsx
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -7,25 +6,56 @@ const RegisterModal = ({ isOpen, onClose }) => {
     name: "",
     email: "",
     password: "",
-    MobileNumber:"",
+    MobileNumber: "",
     role: "customer",
+    profilePhoto: null,
   });
+  const [photo, setPhoto] = useState(null); // ✅ new state for photo
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handlePhotoChange = (e) => {
+    setPhoto(e.target.files[0]);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await axios.post("http://localhost:5000/user/register", formData);
+      const data = new FormData();
+
+      // Append fields manually for better control
+      data.append("name", formData.name);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("MobileNumber", formData.MobileNumber);
+      data.append("role", formData.role);
+
+      if (formData.role === "assistant" && photo) {
+        data.append("photo", photo); // must match backend field name
+      }
+
+      // Debugging: check FormData values
+      for (let pair of data.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      await axios.post("http://localhost:5000/user/register", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       setMessage("✅ Registration successful!");
       setTimeout(() => {
-        onClose(); // Close modal after short delay
+        onClose();
       }, 1000);
     } catch (err) {
-      setMessage("❌ " + (err.response?.data?.message || "Registration failed"));
+      setMessage(
+        "❌ " + (err.response?.data?.message || "Registration failed")
+      );
     }
   };
 
@@ -52,43 +82,66 @@ const RegisterModal = ({ isOpen, onClose }) => {
         )}
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
+            type="text"
             name="name"
             placeholder="Name"
+            value={formData.name}
             onChange={handleChange}
             required
             className="w-full p-2 border rounded"
           />
+
           <input
+            type="email"
             name="email"
             placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
             required
             className="w-full p-2 border rounded"
           />
+
           <input
             type="password"
             name="password"
             placeholder="Password"
+            value={formData.password}
             onChange={handleChange}
             required
             className="w-full p-2 border rounded"
           />
+
           <input
             type="text"
             name="MobileNumber"
             placeholder="Mobile Number"
+            value={formData.MobileNumber}
             onChange={handleChange}
             required
             className="w-full p-2 border rounded"
           />
+
           <select
             name="role"
+            value={formData.role}
             onChange={handleChange}
             className="w-full p-2 border rounded"
           >
             <option value="customer">Customer</option>
             <option value="assistant">Assistant</option>
           </select>
+
+          {/* ✅ Show this only when role is assistant */}
+          {formData.role === "assistant" && (
+            <input
+              type="file"
+              name="photo"
+              accept="image/*"
+              onChange={(e) => setPhoto(e.target.files[0])}
+              className="w-full p-2 border rounded"
+            />
+          )}
+
           <button className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">
             Register
           </button>

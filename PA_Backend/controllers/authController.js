@@ -10,22 +10,38 @@ const generateToken = (user) => {
   );
 };
 
-// Register
-export const register = async (req, res) => {
+export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role, MobileNumber} = req.body;
+    const { name, email, password, MobileNumber, role, profilePhoto} = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "Email already exists" });
+    // Check if email, name, or mobile number already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { name }, { MobileNumber }] });
+    if (existingUser) {
+      if (existingUser.email === email) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      if (existingUser.name === name) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      if (existingUser.MobileNumber === MobileNumber) {
+        return res.status(400).json({ message: "Mobile number already exists" });
+      }
+    }
 
-    const user = new User({ name, email, password, role, MobileNumber });
+    const user = new User({
+      name,
+      email,
+      password,
+      MobileNumber,
+      role,
+      profilePhoto, // save file name
+    });
+
     await user.save();
-
-    const token = generateToken(user);
-    res.status(201).json({ user: { id: user._id, name, email, role, MobileNumber }, token });
+    res.status(201).json({ message: "User registered successfully", user });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

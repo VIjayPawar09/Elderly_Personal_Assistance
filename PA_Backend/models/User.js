@@ -1,13 +1,19 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  MobileNumber :{type: String, required: true, unique:true},
-  password: { type: String, required: true },
-  role: { type: String, enum: ["customer", "assistant"], required: true }
-}, { timestamps: true });
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, unique:true },
+    email: { type: String, required: true, unique: true },
+    MobileNumber: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["customer", "assistant"], required: true },
+    
+    // ✅ New field for profile photo
+    profilePhoto: { type: String },  // store filename or URL
+  },
+  { timestamps: true }
+);
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {

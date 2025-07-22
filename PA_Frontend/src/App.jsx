@@ -7,7 +7,7 @@ import AppointmentPage from "./components/AppointmentPage/Appointment";
 import AssistantProfile from "./components/AssistantProfile/Assistant";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Auth/login";
-import Assistant from "../../PA_Backend/models/Assistant";
+
 import AssistantDashboard from './components/Assistant/AssistantDashboard'
 
 function App() {
