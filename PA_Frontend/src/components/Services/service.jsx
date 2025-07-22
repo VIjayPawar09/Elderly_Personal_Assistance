@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaPills,
   FaUserMd,
@@ -8,13 +9,20 @@ import {
   FaShoppingCart,
   FaBolt,
   FaMobileAlt,
+  FaCogs,
 } from "react-icons/fa";
 import AppointmentPage from "../AppointmentPage/Appointment";
+import AssistantProfile from "../AssistantProfile/Assistant";
+import Dashboard from "../Dashboard";
+import { use } from "react";
+import { Link } from "react-router-dom";
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const formRef = useRef(null); // Reference for scrolling to the form
+
+  const navigate = useNavigate();
 
   const services = [
     {
@@ -63,6 +71,16 @@ const Services = () => {
       description: "Recharge your mobile and pay bills with just a few clicks.",
       icon: <FaMobileAlt className="text-blue-700 text-4xl" />,
     },
+    {
+      title: "Other",
+      description:
+        "If you are thinking about any new services, click here to suggest.",
+      icon: (
+        <button className="p-3 bg-blue-100 rounded-full hover:bg-blue-200 transition">
+          <FaCogs className="text-blue-700 text-3xl" />
+        </button>
+      ),
+    },
   ];
 
   const handleServiceClick = (service) => {
@@ -70,7 +88,7 @@ const Services = () => {
     setShowForm(true);
     setTimeout(() => {
       formRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100); // Small delay to ensure the form is rendered before scrolling
+    }, 100); // Small delay to ensure form renders
   };
 
   const closeForm = () => {
@@ -79,9 +97,10 @@ const Services = () => {
   };
 
   return (
-    <div className="bg-gray-100 py-16">
+    <div id="services" className="bg-gray-100 py-16">
       <div className="container mx-auto text-center">
         <h2 className="text-3xl font-bold text-gray-800 mb-8">Our Services</h2>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <div
@@ -90,21 +109,24 @@ const Services = () => {
               onClick={() => handleServiceClick(service)}
             >
               <div className="mb-4 flex justify-center">{service.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+              <h3 className="text-xl font-bold text-gray-700 mb-2">
                 {service.title}
               </h3>
               <p className="text-gray-600">{service.description}</p>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Form Section */}
-      {showForm && (
-        <div ref={formRef} className="mt-16">
-          <AppointmentPage />
+        {/* Book Appointment Button */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            to="/Dashboard"
+            className="text-white hover:bg-indigo-600 hover:text-indigo-800 bg-indigo-600 px-4 py-2 rounded-lg transition-all duration-300"
+          >
+            Book Appointment
+          </Link>
         </div>
-      )}
+      </div>
     </div>
   );
 };

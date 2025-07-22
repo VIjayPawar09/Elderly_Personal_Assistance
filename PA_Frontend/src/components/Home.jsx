@@ -1,13 +1,8 @@
 import React from 'react'
-import Navbar from './Navbar/NAvbar'
-
+import Navbar from './Navbar/Navbar'
 import Main from './Main/Main'
 import Services from './Services/service'
-import AssistantProfile from './AssistantProfile/Assistant'
-import ProjectDetails from './ProjectDetails/ProjectDetails'
-
-
-
+import ProjectDetails from './Footer/Footer'
 
 const Home = () => {
   return (
@@ -15,7 +10,6 @@ const Home = () => {
         <Navbar />
         <Main/>
         <Services />
-        <AssistantProfile />
         <ProjectDetails />
     </div>
   )

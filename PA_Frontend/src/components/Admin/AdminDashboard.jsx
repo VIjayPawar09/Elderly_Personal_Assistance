@@ -2,7 +2,7 @@ import { Bell, Calendar, ChevronRight, Clock, FileText, Home, LogOut, Menu, Mess
 import { useState } from 'react';
 import AssistantRegistrationHandler from './AssistantRequestHandler'
 
-export default function Dashboard({ sidebarOpen, toggleSidebar, onLogout }) {
+export default function AdminDashboard({ sidebarOpen, toggleSidebar, onLogout }) {
     const [activeTab, setActiveTab] = useState('overview');
     
     return (

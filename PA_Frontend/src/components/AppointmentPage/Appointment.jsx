@@ -1,10 +1,17 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 const AppointmentPage = () => {
+  const location = useLocation();
+  const selectedAssistant = location.state?.assistant || null;
+
   const [formData, setFormData] = useState({
     hours: "",
     time: "",
     service: "",
+    customService: "",
+    charges: "",
     details: "",
   });
 
@@ -17,6 +24,7 @@ const AppointmentPage = () => {
     "Grocery",
     "Electricity Bill",
     "Mobile Bill",
+    "Other",
   ];
 
   const chargesList = [
@@ -30,173 +38,218 @@ const AppointmentPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const makePayment = async () => {
-    const { data } = await axios.post(
-      "https://pa-backend-wprc.onrender.com/api/payment/create-order",
-      {
-        amount: 500, // INR
-      }
-    );
 
-    const options = {
-      key: "rzp_test_XLPxcvbv8wFLpO", // Replace with Razorpay key_id
-      amount: data.amount,
-      currency: data.currency,
-      name: "Personal Assistant App",
-      description: "Test Transaction",
-      order_id: data.orderId,
-      handler: function (response) {
-        alert("Payment Successful!");
-        console.log(response);
-      },
-      prefill: {
-        name: "User Name",
-        email: "user@example.com",
-        contact: "9999999999",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
+  // const makePayment = async () => {
+  //   try {
+  //     const { data } = await axios.post(
+  //       "https://pa-backend-wprc.onrender.com/api/payment/create-order",
+  //       { amount: 500 }
+  //     );
 
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  };
+  //     const options = {
+  //       key: "rzp_test_XLPxcvbv8wFLpO",
+  //       amount: data.amount,
+  //       currency: data.currency,
+  //       name: "Personal Assistant App",
+  //       description: "Appointment Payment",
+  //       order_id: data.orderId,
+  //       handler: function (response) {
+  //         alert("✅ Payment Successful!");
+  //         console.log("Payment:", response);
+  //       },
+  //       prefill: {
+  //         name: "User Name",
+  //         email: "user@example.com",
+  //         contact: "9999999999",
+  //       },
+  //       theme: { color: "#3399cc" },
+  //     };
+
+  //     const rzp = new window.Razorpay(options);
+  //     rzp.open();
+  //   } catch (error) {
+  //     console.error("Payment Error:", error);
+  //     alert("❌ Payment failed. Please try again.");
+  //   }
+  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
-    alert("Appointment Booked Successfully!");
+
+    const selectedService =
+      formData.service === "Other" ? formData.customService : formData.service;
+
+    const finalData = {
+      ...formData,
+      service: selectedService,
+      assistant: selectedAssistant?.name || "Not assigned",
+    };
+
+    console.log("Form Submitted:", finalData);
+    alert("✅ Appointment Booked Successfully!");
+    makePayment();
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 mt-14">
         <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
           Book an Appointment
         </h2>
+
+        {selectedAssistant && (
+          <div className="mb-4 p-4 bg-indigo-100 rounded-md shadow-sm text-center">
+            <h3 className="text-lg font-semibold text-indigo-700">
+              Assigned Assistant
+            </h3>
+            <p className="text-gray-800">{selectedAssistant.name}</p>
+            <p className="text-gray-600">📱 {selectedAssistant.mobile}</p>
+            <img
+              src={selectedAssistant.profilePic}
+              alt={selectedAssistant.name}
+              className="w-16 h-16 rounded-full mx-auto mt-2 border border-indigo-500"
+            />
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Hours */}
+          {/* Assigned Assistant (Read-only) */}
           <div>
             <label
-              htmlFor="hours"
+              htmlFor="assistant"
               className="block text-gray-700 font-medium mb-1"
             >
+              Assigned Assistant
+            </label>
+            <input
+              type="text"
+              id="assistant"
+              name="assistant"
+              value={selectedAssistant?.name || "Not Assigned"}
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700"
+            />
+          </div>
+
+          {/* Hours */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
               Number of Hours
             </label>
             <input
               type="number"
-              id="hours"
               name="hours"
               value={formData.hours}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 border rounded-md"
               required
             />
           </div>
 
           {/* Time */}
           <div>
-            <label
-              htmlFor="time"
-              className="block text-gray-700 font-medium mb-1"
-            >
+            <label className="block text-gray-700 font-medium mb-1">
               Preferred Time
             </label>
             <input
               type="time"
-              id="time"
               name="time"
               value={formData.time}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 border rounded-md"
               required
             />
           </div>
 
-          {/* Services */}
+          {/* Service */}
           <div>
-            <label
-              htmlFor="service"
-              className="block text-gray-700 font-medium mb-1"
-            >
+            <label className="block text-gray-700 font-medium mb-1">
               Select Service
             </label>
             <select
-              id="service"
               name="service"
               value={formData.service}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 border rounded-md"
               required
             >
               <option value="" disabled>
                 Select a service
               </option>
-              {services.map((service, index) => (
-                <option key={index} value={service}>
+              {services.map((service, idx) => (
+                <option key={idx} value={service}>
                   {service}
                 </option>
               ))}
             </select>
           </div>
 
+          {/* Custom Service */}
+          {formData.service === "Other" && (
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Specify Your Service
+              </label>
+              <input
+                type="text"
+                name="customService"
+                value={formData.customService}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="Enter your service..."
+                required
+              />
+            </div>
+          )}
+
           {/* Charges */}
           <div>
-            <label
-              htmlFor="charges"
-              className="block text-gray-700 font-medium mb-1"
-            >
+            <label className="block text-gray-700 font-medium mb-1">
               Charges
             </label>
             <select
-              id="charges"
               name="charges"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              value={formData.charges}
               onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md"
               required
             >
               <option value="" disabled>
-                Select charges based on hours
+                Select based on hours
               </option>
-              {chargesList.map((charge, index) => (
-                <option key={index} value={charge.hours}>
+              {chargesList.map((charge, idx) => (
+                <option key={idx} value={charge.hours}>
                   {charge.hours} Hour(s) - {charge.price}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Additional Details */}
+          {/* Address */}
           <div>
-            <label
-              htmlFor="details"
-              className="block text-gray-700 font-medium mb-1"
-            >
+            <label className="block text-gray-700 font-medium mb-1">
               Address
             </label>
             <textarea
-              id="details"
               name="details"
               value={formData.details}
               onChange={handleChange}
-              rows="4"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-              placeholder="Fill your address here..."
-            ></textarea>
+              rows="3"
+              className="w-full px-3 py-2 border rounded-md"
+              placeholder="Enter your address..."
+              required
+            />
           </div>
 
-          {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
-              onClick={makePayment}
-            >
-              Book Appointment
-            </button>
-          </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+          >
+            Book Appointment
+          </button>
         </form>
       </div>
     </div>

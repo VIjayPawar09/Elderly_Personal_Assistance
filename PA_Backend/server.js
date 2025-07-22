@@ -1,10 +1,14 @@
 // server.js - Main Express application file
+import dotenv from "dotenv";
+dotenv.config();
 import express from 'express';
 import bodyParser from 'body-parser';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
+
 
 import authRoutes from './routes/authRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'

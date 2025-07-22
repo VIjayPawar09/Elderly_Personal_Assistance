@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const assistants = [
   {
@@ -6,91 +7,103 @@ const assistants = [
     age: 28,
     mobile: "+91 9857637856",
     rating: 4.8,
-    profilePic: "https://img.freepik.com/free-photo/ambitious-businessman_1098-18160.jpg?t=st=1734793475~exp=1734797075~hmac=55506949a6fd6f6bb0b0c17102b394137e41d2cd6c1e17bbfc41ee31b83268d9&w=996",
-
+    profilePic:
+      "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
   },
   {
-    name: "Rohit Kale",
+    name: "Ajay Sharma",
     age: 30,
     mobile: "+91 8463787909",
     rating: 4.5,
-    profilePic: "https://img.freepik.com/free-photo/indian-business-man-with-crossed-hands-posing-isolated-white-wall_231208-2626.jpg?ga=GA1.1.1159257864.1734760633&semt=ais_hybrid",
-
+    profilePic:
+      "https://r2.erweima.ai/imgcompressed/img/compressed_0bf14e00cfcb51fab531dda39f371848.webp",
   },
   {
-    name: "Rishabh Sathe",
+    name: "Kiran Singh",
     age: 35,
     mobile: "+91 8749930426",
     rating: 4.9,
-    profilePic: "https://img.freepik.com/free-photo/portrait-young-indian-top-manager-t-shirt-tie-crossed-arms-smiling-white-isolated-wall_496169-1513.jpg?ga=GA1.1.1159257864.1734760633&semt=ais_hybrid",
-    
+    profilePic:
+      "https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_0.jpg",
   },
   {
     name: "Nikhil Mote",
     age: 25,
     mobile: "+91 8937097621",
     rating: 4.7,
-    profilePic: "https://images.pexels.com/photos/913390/pexels-photo-913390.jpeg",
+    profilePic:
+      "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg",
   },
   {
     name: "Atif Shaikh",
     age: 32,
     mobile: "+91 7896064323",
     rating: 4.6,
-    profilePic: "https://images.pexels.com/photos/713520/pexels-photo-713520.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    profilePic:
+      "https://designimages.appypie.com/profilepicture/profilepicture-1-head-person.jpg",
   },
-  
+  {
+    name: "Rahul Shetty",
+    age: 21,
+    mobile: "+91 9999992822",
+    rating: 5,
+    profilePic: "https://www.headshotpro.com/avatar-results/random-1.webp",
+  },
 ];
 
 const AssistantProfile = () => {
+  const navigate = useNavigate();
+
+  const handleAssign = (assistant) => {
+    navigate("/dashboard/book", { state: { assistant } });
+  };
+
   return (
-    <div className="bg-gray-100 py-10">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-        Our Assistants
+    <div className="bg-gradient-to-b from-indigo-50 to-white py-16 px-4">
+      <h1 className="text-4xl font-bold text-center text-indigo-700 mb-12">
+        Meet Our Trusted Assistants
       </h1>
 
-      {/* Cards Grid */}
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
         {assistants.map((assistant, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 text-center"
           >
-            {/* Profile Picture */}
-            <div className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-6 flex justify-center">
-              <img
-                src={assistant.profilePic}
-                alt={assistant.name}
-                className="rounded-full w-24 h-24 border-4 border-white"
-              />
-            </div>
+            <img
+              src={assistant.profilePic}
+              alt={assistant.name}
+              className="w-28 h-28 object-cover rounded-full mx-auto border-4 border-indigo-500 mb-4"
+            />
+            <h2 className="text-xl font-semibold text-gray-800">
+              {assistant.name}
+            </h2>
+            <p className="text-gray-500">Age: {assistant.age}</p>
+            <p className="text-gray-500">📱 {assistant.mobile}</p>
 
-            {/* Details */}
-            <div className="p-6 text-center">
-              <h2 className="text-xl font-bold text-gray-800">
-                {assistant.name}
-              </h2>
-              <p className="text-gray-600 mt-1">Age: {assistant.age}</p>
-              <p className="text-gray-600 mt-1">Mobile: {assistant.mobile}</p>
-              <div className="flex items-center justify-center mt-4">
-                <p className="text-gray-600">Rating:</p>
-                <div className="ml-2 flex items-center">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <svg
-                      key={i}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill={
-                        i < Math.floor(assistant.rating) ? "gold" : "gray"
-                      }
-                      viewBox="0 0 24 24"
-                      className="w-5 h-5"
-                    >
-                      <path d="M12 .587l3.668 7.453L24 9.576l-6 5.84 1.414 8.243L12 18.896l-7.414 4.763L6 15.416 0 9.576l8.332-1.536z" />
-                    </svg>
-                  ))}
-                </div>
+            <div className="mt-3 flex justify-center items-center">
+              <span className="text-gray-600 mr-2">Rating:</span>
+              <div className="flex">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <svg
+                    key={i}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill={i < Math.floor(assistant.rating) ? "gold" : "lightgray"}
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5"
+                  >
+                    <path d="M12 .587l3.668 7.453L24 9.576l-6 5.84 1.414 8.243L12 18.896l-7.414 4.763L6 15.416 0 9.576l8.332-1.536z" />
+                  </svg>
+                ))}
               </div>
             </div>
+
+            <button
+              onClick={() => handleAssign(assistant)}
+              className="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full text-sm transition"
+            >
+              Assign Assistant
+            </button>
           </div>
         ))}
       </div>

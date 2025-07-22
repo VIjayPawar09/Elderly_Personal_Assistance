@@ -1,7 +1,6 @@
 import { useState } from "react";
-import LoginPage from './LoginPage'
-import Dashboard from './DashBoard'
-
+import LoginPage from "./LoginPage";
+import Dashboard from "./AdminDashboard";
 
 export default function AdminPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
