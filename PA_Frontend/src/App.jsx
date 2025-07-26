@@ -8,7 +8,6 @@ import AssistantProfile from "./components/AssistantProfile/Assistant";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Auth/login";
 
-import AssistantDashboard from './components/Assistant/AssistantDashboard'
 
 function App() {
   return (
@@ -21,7 +20,6 @@ function App() {
         <Route path="dashboard/book" element={<Dashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentPage />} />
         <Route path="/dashboard/assistant" element={<AssistantProfile />} />
-        <Route path="/assistant-dashboard" element={<AssistantDashboard />} />
       </Routes>
     </Router>
   );

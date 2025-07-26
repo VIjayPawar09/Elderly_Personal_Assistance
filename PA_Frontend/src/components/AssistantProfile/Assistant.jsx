@@ -1,58 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const assistants = [
-  {
-    name: "Ravi Jadhav",
-    age: 28,
-    mobile: "+91 9857637856",
-    rating: 4.8,
-    profilePic:
-      "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-  },
-  {
-    name: "Ajay Sharma",
-    age: 30,
-    mobile: "+91 8463787909",
-    rating: 4.5,
-    profilePic:
-      "https://r2.erweima.ai/imgcompressed/img/compressed_0bf14e00cfcb51fab531dda39f371848.webp",
-  },
-  {
-    name: "Kiran Singh",
-    age: 35,
-    mobile: "+91 8749930426",
-    rating: 4.9,
-    profilePic:
-      "https://d2qp0siotla746.cloudfront.net/img/use-cases/profile-picture/template_0.jpg",
-  },
-  {
-    name: "Nikhil Mote",
-    age: 25,
-    mobile: "+91 8937097621",
-    rating: 4.7,
-    profilePic:
-      "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg",
-  },
-  {
-    name: "Atif Shaikh",
-    age: 32,
-    mobile: "+91 7896064323",
-    rating: 4.6,
-    profilePic:
-      "https://designimages.appypie.com/profilepicture/profilepicture-1-head-person.jpg",
-  },
-  {
-    name: "Rahul Shetty",
-    age: 21,
-    mobile: "+91 9999992822",
-    rating: 5,
-    profilePic: "https://www.headshotpro.com/avatar-results/random-1.webp",
-  },
-];
+import axios from "axios";
 
 const AssistantProfile = () => {
+  const [assistants, setAssistants] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchAssistants = async () => {
+      try {
+        const res = await axios.get("/api/assistants");
+        console.log("API Response:", res.data); // DEBUG
+        setAssistants(
+          Array.isArray(res.data) ? res.data : res.data.assistants || []
+        );
+      } catch (err) {
+        console.error("Failed to fetch assistants", err);
+      }
+    };
+
+    fetchAssistants();
+  }, []);
 
   const handleAssign = (assistant) => {
     navigate("/dashboard/book", { state: { assistant } });
@@ -88,7 +56,9 @@ const AssistantProfile = () => {
                   <svg
                     key={i}
                     xmlns="http://www.w3.org/2000/svg"
-                    fill={i < Math.floor(assistant.rating) ? "gold" : "lightgray"}
+                    fill={
+                      i < Math.floor(assistant.rating) ? "gold" : "lightgray"
+                    }
                     viewBox="0 0 24 24"
                     className="w-5 h-5"
                   >

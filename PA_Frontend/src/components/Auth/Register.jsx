@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
   });
   const [photo, setPhoto] = useState(null); // ✅ new state for photo
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -100,17 +102,23 @@ const RegisterModal = ({ isOpen, onClose }) => {
             required
             className="w-full p-2 border rounded"
           />
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-
+          <div className="relative w-full">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter Password"
+              required
+              className="w-full p-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <span
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-2/4 -translate-y-1/2 text-gray-600 cursor-pointer"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
           <input
             type="text"
             name="MobileNumber"
