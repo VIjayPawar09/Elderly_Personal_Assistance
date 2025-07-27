@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginModal from "../Auth/login";
 import RegisterModal from "../Auth/Register";
+import { Bell, User } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,12 +20,29 @@ const Navbar = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (currentUser) {
+      // Replace with real socket or API call to fetch notifications
+      setNotifications([
+        { id: 1, from: "Assistant A", message: "New message", senderId: "123" },
+        { id: 2, from: "User B", message: "Hi there", senderId: "456" },
+      ]);
+    }
+  }, [currentUser]);
+
   const toggleNav = () => setIsOpen(!isOpen);
 
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem("rememberedUser");
     navigate("/");
+  };
+
+  const handleNotificationClick = (senderId, senderName) => {
+    navigate("/chat", {
+      state: { assistant: { _id: senderId, name: senderName } },
+    });
+    setNotifications((prev) => prev.filter((n) => n.senderId !== senderId));
   };
 
   return (
@@ -32,37 +52,6 @@ const Navbar = () => {
           <div className="flex justify-between items-center h-16">
             <div className="text-white text-2xl font-bold">
               Elderly Personal Assistance
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button
-                onClick={toggleNav}
-                className="text-white focus:outline-none"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  {isOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
-              </button>
             </div>
 
             {/* Desktop menu */}
@@ -99,17 +88,58 @@ const Navbar = () => {
               </Link>
 
               {currentUser ? (
-                <>
-                  <span className="text-white font-semibold">
-                    Hello, {currentUser.name || currentUser.email}
-                  </span>
+                <div className="relative">
                   <button
-                    onClick={handleLogout}
-                    className="bg-red-600 text-white px-3 py-1 rounded"
+                    onClick={() => setShowProfileMenu((prev) => !prev)}
+                    className="flex items-center gap-2 text-white font-semibold"
                   >
-                    Logout
+                    <User className="h-5 w-5" />
+                    {currentUser.name || currentUser.email}
                   </button>
-                </>
+
+                  {/* Dropdown Menu */}
+                  {showProfileMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg z-20">
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
+                        View Profile
+                      </Link>
+                      <div className="border-t"></div>
+                      <div className="p-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">Notifications</span>
+                          <Bell className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        {notifications.length > 0 ? (
+                          notifications.map((n) => (
+                            <button
+                              key={n.id}
+                              onClick={() =>
+                                handleNotificationClick(n.senderId, n.from)
+                              }
+                              className="text-sm text-left w-full px-2 py-1 hover:bg-indigo-100 rounded"
+                            >
+                              💬 {n.from}: {n.message}
+                            </button>
+                          ))
+                        ) : (
+                          <p className="text-xs text-gray-500">
+                            No notifications
+                          </p>
+                        )}
+                      </div>
+                      <div className="border-t"></div>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 hover:bg-red-100 text-red-600"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <button
@@ -179,11 +209,40 @@ const Navbar = () => {
             )}
           </div>
         )}
+
+        {/* Modals */}
         <RegisterModal
           isOpen={showRegister}
-          onClose={() => setShowRegister(false)}
+          onClose={() => {
+            setShowRegister(false);
+            setShowLogin(true); // optional
+          }}
+          onRegisterSuccess={(user) => {
+            setCurrentUser(user);
+            localStorage.setItem("rememberedUser", JSON.stringify(user));
+
+            if (user.role === "assistant") {
+              navigate("/dashboard");
+            }
+
+            setShowRegister(false);
+          }}
         />
-        <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
+
+        <LoginModal
+          isOpen={showLogin}
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={(user) => {
+            setCurrentUser(user);
+            localStorage.setItem("rememberedUser", JSON.stringify(user));
+            setShowLogin(false);
+
+            // ✅ redirect only if role is customer
+            if (user.role === "assistant") {
+              navigate("/dashboard");
+            }
+          }}
+        />
       </nav>
     </>
   );

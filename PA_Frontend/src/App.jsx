@@ -7,6 +7,7 @@ import AppointmentPage from "./components/AppointmentPage/Appointment";
 import AssistantProfile from "./components/AssistantProfile/Assistant";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Auth/login";
+import ChatPage from "./components/Chat/chat";
 
 
 function App() {
@@ -17,6 +18,8 @@ function App() {
         <Route path="/admin" element={<AdminPortal />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/chat" element={<ChatPage />} />
+        <Route path="*" element={<div>Page Not Found</div>} />
         <Route path="dashboard/book" element={<Dashboard />} />
         <Route path="/dashboard/appointment" element={<AppointmentPage />} />
         <Route path="/dashboard/assistant" element={<AssistantProfile />} />

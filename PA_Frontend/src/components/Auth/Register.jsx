@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const RegisterModal = ({ isOpen, onClose }) => {
+const RegisterModal = ({ isOpen, onClose, onRegisterSuccess }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,7 +11,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
     role: "customer",
     profilePhoto: null,
   });
-  const [photo, setPhoto] = useState(null); // ✅ new state for photo
+  const [photo, setPhoto] = useState(null);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -22,13 +22,12 @@ const RegisterModal = ({ isOpen, onClose }) => {
   const handlePhotoChange = (e) => {
     setPhoto(e.target.files[0]);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const data = new FormData();
-
-      // Append fields manually for better control
       data.append("name", formData.name);
       data.append("email", formData.email);
       data.append("password", formData.password);
@@ -36,21 +35,27 @@ const RegisterModal = ({ isOpen, onClose }) => {
       data.append("role", formData.role);
 
       if (formData.role === "assistant" && photo) {
-        data.append("photo", photo); // must match backend field name
+        data.append("photo", photo);
       }
 
-      // Debugging: check FormData values
-      for (let pair of data.entries()) {
-        console.log(pair[0], pair[1]);
-      }
+      await axios
+        .post("http://localhost:5000/user/register", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          setMessage("✅ Registration successful!");
+          onRegisterSuccess(res.data.user); // <-- pass the user object
+        });
 
-      await axios.post("http://localhost:5000/user/register", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios
+        .post("http://localhost:5000/user/login", loginData)
+        .then((res) => {
+          setMessage("✅ Login successful!");
+          onLoginSuccess(res.data.user); // <-- pass the user object
+        });
 
-      setMessage("✅ Registration successful!");
       setTimeout(() => {
         onClose();
       }, 1000);
@@ -102,6 +107,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
             required
             className="w-full p-2 border rounded"
           />
+
           <div className="relative w-full">
             <input
               type={showPassword ? "text" : "password"}
@@ -119,6 +125,7 @@ const RegisterModal = ({ isOpen, onClose }) => {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
+
           <input
             type="text"
             name="MobileNumber"
@@ -139,13 +146,12 @@ const RegisterModal = ({ isOpen, onClose }) => {
             <option value="assistant">Assistant</option>
           </select>
 
-          {/* ✅ Show this only when role is assistant */}
           {formData.role === "assistant" && (
             <input
               type="file"
               name="photo"
               accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
+              onChange={handlePhotoChange}
               className="w-full p-2 border rounded"
             />
           )}

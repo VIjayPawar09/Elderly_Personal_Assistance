@@ -9,7 +9,7 @@ const AssistantProfile = () => {
   useEffect(() => {
     const fetchAssistants = async () => {
       try {
-        const res = await axios.get("/api/assistants");
+        const res = await axios.get("http://localhost:5000/api/assistants");
         console.log("API Response:", res.data); // DEBUG
         setAssistants(
           Array.isArray(res.data) ? res.data : res.data.assistants || []
@@ -26,6 +26,10 @@ const AssistantProfile = () => {
     navigate("/dashboard/book", { state: { assistant } });
   };
 
+const handleChat = (assistant) => {
+  navigate("/dashboard/Chat", {state: {assistant}});
+}
+
   return (
     <div className="bg-gradient-to-b from-indigo-50 to-white py-16 px-4">
       <h1 className="text-4xl font-bold text-center text-indigo-700 mb-12">
@@ -39,7 +43,7 @@ const AssistantProfile = () => {
             className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 text-center"
           >
             <img
-              src={assistant.profilePic}
+              src={assistant.profilePhoto}
               alt={assistant.name}
               className="w-28 h-28 object-cover rounded-full mx-auto border-4 border-indigo-500 mb-4"
             />
@@ -47,7 +51,7 @@ const AssistantProfile = () => {
               {assistant.name}
             </h2>
             <p className="text-gray-500">Age: {assistant.age}</p>
-            <p className="text-gray-500">📱 {assistant.mobile}</p>
+            <p className="text-gray-500">📱 {assistant.MobileNumber}</p>
 
             <div className="mt-3 flex justify-center items-center">
               <span className="text-gray-600 mr-2">Rating:</span>
@@ -73,6 +77,13 @@ const AssistantProfile = () => {
               className="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full text-sm transition"
             >
               Assign Assistant
+            </button>
+
+            <button 
+              onClick={() => handleChat(assistant)}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm transition"
+            >
+              Chat
             </button>
           </div>
         ))}
