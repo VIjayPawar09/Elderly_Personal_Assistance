@@ -15,6 +15,31 @@ const AppointmentPage = () => {
     details: "",
   });
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const selectedService =
+      formData.service === "Other" ? formData.customService : formData.service;
+
+    const finalData = {
+      ...formData,
+      service: selectedService,
+      assistant: selectedAssistant?.name || "Not assigned",
+    };
+
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/appointments/book",
+        finalData
+      );
+
+      alert("✅ Appointment Booked Successfully!");
+      navigate("/appointments");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to book appointment");
+    }
+  };
   const services = [
     "Medications",
     "Doctor Appointment",
@@ -74,23 +99,6 @@ const AppointmentPage = () => {
   //     alert("❌ Payment failed. Please try again.");
   //   }
   // };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const selectedService =
-      formData.service === "Other" ? formData.customService : formData.service;
-
-    const finalData = {
-      ...formData,
-      service: selectedService,
-      assistant: selectedAssistant?.name || "Not assigned",
-    };
-
-    console.log("Form Submitted:", finalData);
-    alert("✅ Appointment Booked Successfully!");
-    makePayment();
-  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">

@@ -18,6 +18,7 @@ import User from './models/User.js';
 import Assistant from './models/Assistant.js';
 import Customer from './models/Customer.js';
 import Message from './models/Message.js'; // For message persistence
+import appointmentRoutes from './routes/appointmentRoutes.js'
 
 const app = express();
 const server = http.createServer(app);
@@ -25,10 +26,15 @@ const server = http.createServer(app);
 // ✅ Socket.io configuration
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // or your frontend prod domain
+    origin: "http://localhost:5173", // or your frontend prod domain
     methods: ["GET", "POST"]
   }
 });
+app.use(cors({
+  origin: 'http://localhost:5173', // React Vite dev server
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 
 let onlineUsers = {};
 
@@ -65,12 +71,12 @@ io.on("connection", (socket) => {
   });
 });
 
-// ✅ Middleware
-app.use(cors({
-  origin: 'https://personalassistance.netlify.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
+// // ✅ Middleware
+// app.use(cors({
+//   origin: 'https://personalassistance.netlify.app',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   credentials: true
+// }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
@@ -79,6 +85,8 @@ app.use("/uploads", express.static("uploads"));
 app.use('/user', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/api/assistants', assistantRoutes);
+app.use("/api/appointments", appointmentRoutes);
+
 
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
